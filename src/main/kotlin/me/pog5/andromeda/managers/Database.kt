@@ -4,10 +4,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.UUID
-import kotlin.text.insert
+import java.util.*
 
 class Database(private val database: Database) {
     init {
@@ -15,6 +13,7 @@ class Database(private val database: Database) {
             SchemaUtils.create(PersistentDataEntity)
         }
     }
+
     fun loadPlayerData(uuid: UUID): PersistentData? {
         return transaction(database) {
             PersistentDataEntity.select { PersistentDataEntity.uuid eq uuid }

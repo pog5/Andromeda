@@ -4,8 +4,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 
 class Formatting {
-    public fun mm(miniMessageString: String): Component {
-        return MiniMessage.miniMessage().deserialize(miniMessageString);
+    fun mm(miniMessageString: String): Component {
+        return MiniMessage.miniMessage().deserialize(miniMessageString)
     }
 
     fun str(component: Component): String {

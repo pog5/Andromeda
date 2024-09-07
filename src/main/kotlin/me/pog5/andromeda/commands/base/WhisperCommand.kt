@@ -35,7 +35,7 @@ class WhisperCommand: AndromedaCommand {
                     sender?.player?.sendMessage("You whispered to ${target.data.user.name}: $message")
                     target.player.sendMessage("${target.data.user.name} whispered to you: $message")
                 } else {
-                    sender.sendMessage("Player not found")
+                    sender?.sendMessage("Player not found")
                 }
             }
         )

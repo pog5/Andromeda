@@ -3,7 +3,6 @@ package me.pog5.andromeda.managers
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromJsonElement
 import me.pog5.andromeda.Andromeda
 import me.pog5.andromeda.util.SUUID
 import net.kyori.adventure.text.Component
@@ -13,7 +12,6 @@ import org.bukkit.inventory.PlayerInventory
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ColumnType
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.json.json
 import org.postgresql.util.PGobject
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -22,7 +20,12 @@ data class User(
     val player: Player,
     var session: SessionData,
     var data: PersistentData,
-)
+) {
+    fun sendMessage(message: Component) {
+        player.sendMessage(message)
+    }
+    fun sendMessage(message: String) = sendMessage(Component.text(message))
+}
 
 data class SessionData(
     var spectatorState: Boolean = true,
@@ -143,7 +146,8 @@ class UserManager(private val plugin: Andromeda, private val database: Database)
 
     fun getOnlineUUIDs(): Set<UUID> = activePlayers.keys
 
-    fun getOnlineNames(ignoreDisguises: Boolean = false): Set<String> = activePlayers.values.mapTo(HashSet()) { it.player.name }.toSet()
+    fun getOnlineNames(ignoreDisguises: Boolean = false): Set<String> =
+        activePlayers.values.mapTo(HashSet()) { it.player.name }.toSet()
 
     // Example of event-related method (e.g., handling a player's death)
     fun handlePlayerDeath(player: Player) {
