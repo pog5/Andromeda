@@ -5,9 +5,13 @@ data class Punishment(
     val reason: String,
     val duration: Long,
     val staff: User?,
-    val date: Long,
-    val active: Boolean,
-)
+    val timestamp: Long,
+) {
+    val expired: Boolean
+        get() = System.currentTimeMillis() > timestamp + duration
+    val id: Int
+        get() = this.hashCode()
+}
 
 class PunishmentManager {
 }
