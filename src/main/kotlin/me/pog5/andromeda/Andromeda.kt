@@ -5,9 +5,7 @@ import me.pog5.andromeda.commands.AndromedaCommand
 import me.pog5.andromeda.commands.base.HelpCommand
 import me.pog5.andromeda.commands.base.WhisperCommand
 import me.pog5.andromeda.listener.PlayerEventListeners
-import me.pog5.andromeda.managers.ConfigManager
-import me.pog5.andromeda.managers.Database
-import me.pog5.andromeda.managers.UserManager
+import me.pog5.andromeda.managers.*
 import me.pog5.andromeda.util.Formatting
 import org.bukkit.event.HandlerList
 import org.bukkit.plugin.java.JavaPlugin
@@ -27,8 +25,8 @@ class Andromeda : JavaPlugin() {
         .buildOnEnable(this)
 
     override fun onEnable() {
-        val db: org.jetbrains.exposed.sql.Database = org.jetbrains.exposed.sql.Database
-        userManager = UserManager(this, Database(this))
+        val db = activateDatabase(configManager.getConfig())
+        userManager = UserManager(this, Database(db))
         setupCloud() // Register Cloud Commands
 
         server.pluginManager.registerEvents(PlayerEventListeners(this), this)
@@ -43,6 +41,33 @@ class Andromeda : JavaPlugin() {
 
     override fun onDisable() {
         HandlerList.unregisterAll(this)
+    }
+
+    fun activateDatabase(config: Config): org.jetbrains.exposed.sql.Database {
+        when(configManager.getConfig().databaseType) {
+            DatabaseType.SQLITE -> {
+                val db = org.jetbrains.exposed.sql.Database.connect(
+                    "jdbc:sqlite:${dataFolder}/" + configManager.getConfig().sqliteConfig?.filePath!!
+                )
+                return db
+            }
+            DatabaseType.POSTGRES -> {
+                val db = org.jetbrains.exposed.sql.Database.connect(
+                    url = "jdbc:postgresql://" +
+                            configManager.getConfig().postgresConfig?.host!! + ":" +
+                            configManager.getConfig().postgresConfig?.port!! + "/" +
+                            configManager.getConfig().postgresConfig?.database!!,
+                    user = configManager.getConfig().postgresConfig?.username!!,
+                    password = configManager.getConfig().postgresConfig?.password!!
+                )
+                return db
+            }
+            else -> {
+                logger.severe("Invalid database type in config.yml")
+                server.pluginManager.disablePlugin(this)
+                throw Exception("Invalid database type in config.yml")
+            }
+        }
     }
 
     fun setupCloud() {
