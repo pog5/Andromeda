@@ -1,0 +1,8 @@
+name: Andromeda
+version: '1.0'
+main: me.pog5.andromeda.Andromeda
+api-version: '1.21'
+load: STARTUP
+authors: [ @pog5 ]
+description: Andromeda ✨
+website: https://github.com/pog5/andromeda
