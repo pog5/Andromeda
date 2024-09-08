@@ -1,14 +1,11 @@
 package me.pog5.andromeda.managers
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import me.pog5.andromeda.Andromeda
 import me.pog5.andromeda.util.SUUID
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.PlayerInventory
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.json.json
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -33,13 +30,8 @@ data class PersistentData(
     val pvp: PDPvP = PDPvP(),
 )
 
-object PersistentDataEntity : Table() {
-    val uuid = uuid("uuid")
-    val data = json("data", Json, PersistentData.serializer())
-}
-
-@Serializable
 @JvmInline
+@Serializable
 value class Nick(val value: String?)
 
 @JvmInline
@@ -84,17 +76,17 @@ data class PDPvP(
         }
 }
 
-class UserManager(private val plugin: Andromeda, private val database: Database) {
+class UserManager(private val plugin: Andromeda, private val database: DatabaseConfig) {
     private val activePlayers: MutableMap<UUID, User> = ConcurrentHashMap()
 
     fun addPlayer(player: Player) {
-        val persistentData = database.loadPlayerData(player) ?: PersistentData()
+        val persistentData = database.loadPlayerData(player)
         activePlayers[player.uniqueId] = User(player, SessionData(), persistentData)
     }
 
     fun removePlayer(player: Player) {
         activePlayers.remove(player.uniqueId)?.let {
-            database.savePlayerData(player.uniqueId, it.data)
+            database.savePlayerData(player, it.data)
         }
     }
 

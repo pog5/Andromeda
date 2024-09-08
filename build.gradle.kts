@@ -22,22 +22,30 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    /* Cloud */
+
+    // Cloud Command Framework
     implementation("org.incendo:cloud-paper:2.0.0-beta.9")
     implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.9")
 
     // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
+    implementation("com.charleskorn.kaml:kaml:0.61.0")
 
     // PostgreSQL
-    implementation("org.postgresql:postgresql:42.7.4") // Or latest version
-    implementation("org.jetbrains.exposed:exposed-core:0.42.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.42.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.42.1")
-    implementation("org.jetbrains.exposed:exposed-json:0.42.1")
+//    implementation("org.postgresql:postgresql:42.7.4")
+//    implementation("org.jetbrains.exposed:exposed-core:0.42.1")
+//    implementation("org.jetbrains.exposed:exposed-dao:0.42.1")
+//    implementation("org.jetbrains.exposed:exposed-jdbc:0.42.1")
+//    implementation("org.jetbrains.exposed:exposed-json:0.42.1")
 
     // SQLite
-    implementation("org.xerial:sqlite-jdbc:3.46.1.0") // Or latest version
+//    implementation("org.xerial:sqlite-jdbc:3.46.1.0")
+
+    // Redis
+    implementation("redis.clients:jedis:5.1.2")
+
+    // MongoDB
+    implementation("org.mongodb:mongodb-driver-sync:5.1.4")
 }
 
 val targetJavaVersion = 21
