@@ -13,5 +13,4 @@ data class Punishment(
         get() = this.hashCode()
 }
 
-class PunishmentManager {
-}
+class PunishmentManager

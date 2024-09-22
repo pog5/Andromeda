@@ -1,7 +1,6 @@
 package me.pog5.andromeda
 
 import io.papermc.paper.command.brigadier.CommandSourceStack
-import me.pog5.andromeda.commands.AndromedaCommand
 import me.pog5.andromeda.commands.base.HelpCommand
 import me.pog5.andromeda.commands.base.WhisperCommand
 import me.pog5.andromeda.listener.PlayerEventListeners
@@ -48,7 +47,7 @@ class Andromeda : JavaPlugin() {
         MinecraftExceptionHandler.create(CommandSourceStack::getSender)
 
         // Basic Commands
-        val basicCommands = setOf<AndromedaCommand>(HelpCommand(), WhisperCommand())
+        val basicCommands = setOf(HelpCommand(), WhisperCommand())
         basicCommands.forEach { cmd -> cmd.implement(this) }
     }
 

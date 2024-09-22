@@ -43,5 +43,4 @@ data class WorldSettings(
 //    val height: Int
 //)
 
-class WorldManager {
-}
+class WorldManager

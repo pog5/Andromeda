@@ -29,11 +29,11 @@ sealed class DatabaseConfig {
     ) : DatabaseConfig() {
         override val type: DatabaseType = DatabaseType.SQLITE
         private val uri = "jdbc:sqlite:$filePath"
-        val connection = DriverManager.getConnection(uri);
+        val connection = DriverManager.getConnection(uri)
         override fun loadPlayerData(player: Player): PersistentData {
-            val statement = connection.createStatement();
-            statement.execute("CREATE TABLE IF NOT EXISTS players (uuid TEXT PRIMARY KEY, data JSON)");
-            val resultSet = statement.executeQuery("SELECT * FROM players WHERE uuid = '${player.uniqueId}'");
+            val statement = connection.createStatement()
+            statement.execute("CREATE TABLE IF NOT EXISTS players (uuid TEXT PRIMARY KEY, data JSON)")
+            val resultSet = statement.executeQuery("SELECT * FROM players WHERE uuid = '${player.uniqueId}'")
             if (resultSet.next()) {
                 try {
                     return Json.decodeFromString<PersistentData>(resultSet.getString("data"))
@@ -46,9 +46,9 @@ sealed class DatabaseConfig {
         }
 
         override fun savePlayerData(player: Player, data: PersistentData) {
-            val statement = connection.createStatement();
-            statement.execute("CREATE TABLE IF NOT EXISTS players (uuid TEXT PRIMARY KEY, data JSON)");
-            statement.execute("INSERT OR REPLACE INTO players (uuid, data) VALUES ('${player.uniqueId}', '${Json.encodeToString(PersistentData.serializer(), data)}')");
+            val statement = connection.createStatement()
+            statement.execute("CREATE TABLE IF NOT EXISTS players (uuid TEXT PRIMARY KEY, data JSON)")
+            statement.execute("INSERT OR REPLACE INTO players (uuid, data) VALUES ('${player.uniqueId}', '${Json.encodeToString(PersistentData.serializer(), data)}')")
         }
     }
 
@@ -62,10 +62,25 @@ sealed class DatabaseConfig {
     ) : DatabaseConfig() {
         override val type: DatabaseType = DatabaseType.POSTGRES
         override fun loadPlayerData(player: Player): PersistentData {
-            TODO()
+            val connection = DriverManager.getConnection("jdbc:postgresql://$host:$port/$database", username, password)
+            val statement = connection.createStatement()
+            statement.execute("CREATE TABLE IF NOT EXISTS players (uuid TEXT PRIMARY KEY, data JSON)")
+            val resultSet = statement.executeQuery("SELECT * FROM players WHERE uuid = '${player.uniqueId}'")
+            if (resultSet.next()) {
+                try {
+                    return Json.decodeFromString<PersistentData>(resultSet.getString("data"))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    player.kick(kickMessage.append(Component.text(e.localizedMessage)).build())
+                }
+            }
+            return PersistentData()
         }
         override fun savePlayerData(player: Player, data: PersistentData) {
-            TODO()
+            val connection = DriverManager.getConnection("jdbc:postgresql://$host:$port/$database", username, password)
+            val statement = connection.createStatement()
+            statement.execute("CREATE TABLE IF NOT EXISTS players (uuid TEXT PRIMARY KEY, data JSON)")
+            statement.execute("INSERT OR REPLACE INTO players (uuid, data) VALUES ('${player.uniqueId}', '${Json.encodeToString(PersistentData.serializer(), data)}')")
         }
     }
 
@@ -75,10 +90,25 @@ sealed class DatabaseConfig {
     ) : DatabaseConfig() {
         override val type: DatabaseType = DatabaseType.MONGODB
         override fun loadPlayerData(player: Player): PersistentData {
-            TODO()
+            val client = com.mongodb.client.MongoClients.create(connectionString)
+            val database = client.getDatabase("andromeda")
+            val collection = database.getCollection("players")
+            val document = collection.find(org.bson.Document("uuid", player.uniqueId.toString())).first()
+            if (document != null) {
+                try {
+                    return Json.decodeFromString<PersistentData>(document.getString("data"))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    player.kick(kickMessage.append(Component.text(e.localizedMessage)).build())
+                }
+            }
+            return PersistentData()
         }
         override fun savePlayerData(player: Player, data: PersistentData) {
-            TODO()
+            val client = com.mongodb.client.MongoClients.create(connectionString)
+            val database = client.getDatabase("andromeda")
+            val collection = database.getCollection("players")
+            collection.insertOne(org.bson.Document("uuid", player.uniqueId.toString()).append("data", Json.encodeToString(PersistentData.serializer(), data)))
         }
     }
 }
@@ -89,5 +119,4 @@ enum class DatabaseType {
     MONGODB,
 }
 
-class DatabaseManager {
-}
+class DatabaseManager

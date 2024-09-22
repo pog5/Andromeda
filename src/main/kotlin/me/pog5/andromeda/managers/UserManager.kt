@@ -11,16 +11,17 @@ import java.util.concurrent.ConcurrentHashMap
 
 data class User(
     val player: Player,
-    var session: SessionData, // redis
-    var data: PersistentData, // postgre
+    var session: SessionData,
+    var data: PersistentData,
 ) {
     fun sendMessage(message: Component) = player.sendMessage(message)
     fun sendMessage(message: String) = sendMessage(Component.text(message))
 }
 
 data class SessionData(
-    var spectatorState: Boolean = true,
-    var currentWorld: World? = null,
+    var spectatorState: Boolean = false,
+    var combatTicksLeft: Long = -1,
+    var damageLog: HashMap<User, Double> = hashMapOf(),
 )
 
 @Serializable
@@ -64,8 +65,6 @@ data class PDPvP(
     val savedKits: MutableMap<String, PlayerInventory> = hashMapOf(),
     private var _killStreak: Int = 0,
     var highestKillStreak: Int = 0,
-    var lastKilledBy: String = "",
-    var lastKilledAt: Long = 0,
 ) {
     val kdr: Double get() = if (deaths == 0) kills.toDouble() else kills.toDouble() / deaths
     var killStreak: Int
